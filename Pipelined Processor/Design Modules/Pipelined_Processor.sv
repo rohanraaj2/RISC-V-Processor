@@ -1,123 +1,87 @@
-`include "Program_Counter.v"
-`include "Adder.v"
-`include "MUX.v"
-`include "Instruction_Memory.v"
-`include "IFID.v"
-`include "IDEX.v"
-`include "EXMEM.v"
-`include "MEMWB.v"
-`include "Instruction.v"
-`include "Imm_data_gen.v"
-`include "RegisterFile.v"
-`include "Control_Unit.v"
-`include "ALU_64_bit.v"
-`include "ALU_Control.v"
-`include "Branch_module.v"
-`include "Data_Memory.v"
+`timescale 1ns / 1ps
 
-module Pipelined_Processor(clk, reset);
-   input clk;
-   input reset;
-  
-  wire [63:0] Init_PC_In;
-wire [63:0] Init_PC_Out;
-wire [63:0] MUX1_Input1;
-wire [63:0] MUX1_Input2;
-wire [31:0] Instruction_IF;
-wire [31:0] Instruction_ID;
-wire [63:0] PC_Out_ID;
-// wire to_branch;
-wire [6:0] opcode_ID;
-wire [4:0] rd_ID;
-wire [2:0] f3_ID;
-wire [4:0] rs1_ID;
-wire [4:0] rs2_ID;
-wire [6:0] f7_ID;
-wire [63:0] imm_data_ID;
-wire [63:0] MUX5_Out;
-wire [4:0] rd_WB;
-wire [63:0] Read_Data_1_ID;
-wire [63:0] Read_Data_2_ID;
-wire RegWrite_WB;
-wire [1:0] ALUOp_ID;
-wire Branch_ID;
-wire MemRead_ID;
-wire MemtoReg_ID;
-wire MemWrite_ID;
-wire ALUSrc_ID;
-wire RegWrite_ID;
-wire Branch_EX;
-wire MemRead_EX;
-wire MemtoReg_EX;
-wire MemWrite_EX;
-wire ALUSrc_EX;
-wire RegWrite_EX;
-wire [63:0] Read_Data_1_EX;
-wire [63:0] Read_Data_2_EX;
-wire [63:0] PC_Out_EX;
-wire [1:0] ALUOp_EX;
-wire [63:0] imm_data_EX;
-wire [3:0] Funct_EX;
-wire [4:0] rs1_EX;
-wire [4:0] rs2_EX;
-wire [4:0] rd_EX;
-wire [3:0] Operation_EX;
-wire [63:0] shift_Left_out;
-wire [63:0] Branch_Adder_Out_EX;
-wire [63:0] MUX_out_EX;
-wire [63:0] Result_EX;
-wire Zero_EX;
-wire pos_EX;
-wire RegWrite_MEM;
-wire MemtoReg_MEM;
-wire MemWrite_MEM;
-wire MemRead_MEM;
-wire Branch_MEM;
-wire Zero_MEM;
-wire [63:0] Result_MEM;
-wire [63:0] Branch_Adder_Out_MEM;
-wire [63:0] Read_Data_2_MEM;
-wire [4:0] rd_MEM;
-wire pos_MEM;
-wire to_branch_MEM;
-wire blt_MEM;
-wire bge_MEM;
-wire bne_MEM;
-wire beq_MEM;
-wire [2:0] funct3_MEM;
-wire [63:0] Read_Data_MEM;
-wire MemtoReg_WB;
-wire [63:0] Read_Data_WB;
-wire [63:0]Result_WB;
-Program_Counter p1(clk, reset, Init_PC_In, Init_PC_Out);
-Adder a1(Init_PC_Out, 64'd4, MUX1_Input1);
-MUX m1(MUX1_Input1,MUX1_Input2, to_branch_MEM,Init_PC_In);
-Instruction_Memory i1(Init_PC_Out, Instruction_IF);
-
-  IFID i2(clk, reset, Init_PC_Out, Instruction_IF, Instruction_ID, PC_Out_ID);
-
-  Instruction i3(Instruction_ID, opcode_ID, rd_ID, f3_ID, rs1_ID, rs2_ID, f7_ID);
-Imm_data_gen i4(Instruction_ID, imm_data_ID);   
-RegisterFile r1(clk, reset, rs1_ID, rs2_ID, rd_WB, MUX5_Out, RegWrite_WB, Read_Data_1_ID, Read_Data_2_ID);
-Control_Unit c1(opcode_ID, ALUOp_ID, Branch_ID, MemRead_ID, MemtoReg_ID, MemWrite_ID, ALUSrc_ID, RegWrite_ID);
-
-  IDEX i5(clk, reset, {Instruction_ID[30], Instruction_ID[14:12]}, ALUOp_ID, MemtoReg_ID, RegWrite_ID, Branch_ID, MemWrite_ID, MemRead_ID, ALUSrc_ID, Read_Data_1_ID, Read_Data_2_ID, rd_ID, rs1_ID, rs2_ID, imm_data_ID, PC_Out_ID, PC_Out_EX, Funct_EX, ALUOp_EX, MemtoReg_EX, RegWrite_EX, Branch_EX, MemWrite_EX, MemRead_EX, ALUSrc_EX, Read_Data_1_EX, Read_Data_2_EX, rs1_EX, rs2_EX, rd_EX, imm_data_EX);
-
-  ALU_Control a2(ALUOp_EX, Funct_EX, Operation_EX);
-  Adder a3(PC_Out_EX, imm_data_EX << 1, Branch_Adder_Out_EX);
-MUX m2(Read_Data_2_EX, imm_data_EX, ALUSrc_EX, MUX_out_EX);
-ALU_64_bit a4(Read_Data_1_EX, MUX_out_EX, Operation_EX, Zero_EX, Result_EX, pos_EX);
-
-  EXMEM e1(clk, reset, rd_EX, Branch_EX, MemWrite_EX, MemRead_EX, MemtoReg_EX, RegWrite_EX, Branch_Adder_Out_EX, Result_EX, Zero_EX, Read_Data_2_EX, Read_Data_2_MEM, Branch_Adder_Out_MEM, rd_MEM, Branch_MEM, MemWrite_MEM, MemRead_MEM, MemtoReg_MEM, RegWrite_MEM, Result_MEM, Zero_MEM);
-
-  branch_module b1(Zero_MEM, pos_MEM, Branch_MEM, funct3_MEM, bne_MEM, beq_MEM, bge_MEM, blt_MEM, to_branch_MEM);
-  
-Data_Memory d1(clk, Result_MEM, Read_Data_2_MEM, MemWrite_MEM, MemRead_MEM, Read_Data_MEM, funct3_MEM);
-
-  MEMWB m0(clk, reset, Result_MEM, Read_Data_MEM, rd_MEM, MemtoReg_MEM, RegWrite_MEM, MemtoReg_WB, RegWrite_WB, Result_WB, Read_Data_WB, rd_WB);
-
-  MUX m5(Result_WB, Read_Data_WB, MemtoReg_WB, MUX5_Out);
-
-
-
+module RISC_V_Pipelined(
+    input clk,
+    input reset,
+    output reg [63:0] PC_In, PC_Out, Adder1Out, Adder2Out, Imm, WriteData, ReadData1, ReadData2, Result, Read_Data,
+    output reg  [63:0] MuxmidOut,
+    output reg  [31:0] Instruction,
+    output reg  [6:0] Opcode, Funct7,
+    output reg  [4:0] RD, RS1, RS2,
+    output reg  [3:0] Funct, Operation,
+    output reg  [2:0] Funct3,
+    output reg  [1:0] ALUOp,
+    output reg  Branch, MemRead, MemWrite, MemtoReg, RegWrite, ALUSrc, Zero, sel_Branch,
+    
+    output reg  [63:0] IFID_PC_Out,
+    output reg  [31:0] IFID_Instruction,
+    
+    output reg  IDEX_Branch, IDEX_MemRead, IDEX_MemWrite, IDEX_MemtoReg, IDEX_RegWrite, IDEX_ALUSrc,
+    EM_Branch, EM_MemRead, EM_MemWrite, EM_MemtoReg, EM_RegWrite, EM_Zero,
+    MW_MemtoReg, MW_RegWrite,
+    output reg  [1:0] IDEX_ALUOp,
+    output reg  [3:0] IDEX_Funct,
+    output reg  [4:0] IDEX_RS1, IDEX_RS2, IDEX_RD, EM_RD, MW_RD,
+    output reg  [63:0] IDEX_PC_Out, IDEX_ReadData1, IDEX_ReadData2, IDEX_Imm,
+                EM_Adder2Out, EM_Result, EM_WriteData, MW_Result, MW_Read_Data);
+// Declaration of all necessary wires // 
+    wire [63:0] PC_In, PC_Out, Adder1Out, Adder2Out, Imm, WriteData, ReadData1, ReadData2, Result, Read_Data;
+    wire [63:0] MuxmidOut;
+    wire [31:0] Instruction;
+    wire [6:0] Opcode, Funct7;
+    wire [4:0] RD, RS1, RS2;
+    wire [3:0] Funct, Operation;
+    wire [2:0] Funct3;
+    wire [1:0] ALUOp;
+    wire Branch, MemRead, MemWrite, MemtoReg, RegWrite, ALUSrc, Zero, sel_Branch;
+    
+    wire [63:0] IFID_PC_Out;
+    wire [31:0] IFID_Instruction;
+    
+    wire IDEX_Branch, IDEX_MemRead, IDEX_MemWrite, IDEX_MemtoReg, IDEX_RegWrite, IDEX_ALUSrc,
+    EM_Branch, EM_MemRead, EM_MemWrite, EM_MemtoReg, EM_RegWrite, EM_Zero,
+    MW_MemtoReg, MW_RegWrite;
+    wire [1:0] IDEX_ALUOp;
+    wire [3:0] IDEX_Funct;
+    wire [4:0] IDEX_RS1, IDEX_RS2, IDEX_RD, EM_RD, MW_RD;
+    wire [63:0] IDEX_PC_Out, IDEX_ReadData1, IDEX_ReadData2, IDEX_Imm,
+                EM_Adder2Out, EM_Result, EM_WriteData, MW_Result, MW_Read_Data;
+    
+    // --------------------------------------------------------------------- //
+    // Stage 1 - Instruction Fetch //
+    Mux_2x1 muxfirst(.A(Adder1Out), .B(EM_Adder2Out), .S(sel_Branch), .Out(PC_In)); 
+    Program_Counter PC(.clk(clk), .reset(reset), .PC_In(PC_In), .PC_Out(PC_Out));
+    Adder add1(.A(PC_Out), .B(64'd4), .Out(Adder1Out));
+    Instruction_Memory IM(.Inst_Address(PC_Out), .Instruction(Instruction));
+    IF_ID ifid(.clk(clk), .reset(reset), .Instruction(Instruction), .PC_Out(PC_Out), .IFID_Instruction(IFID_Instruction), .IFID_PC_Out(IFID_PC_Out));
+    
+    // Stage 2 - Instruction Decode //
+    Instruction_Parser IP(.Instruction(IFID_Instruction), .Opcode(Opcode), .RD(RD), .Funct3(Funct3), .RS1(RS1), .RS2(RS2), .Funct7(Funct7));
+    Control_Unit CU(.Opcode(Opcode), .ALUOp(ALUOp), .Branch(Branch), .MemRead(MemRead), .MemtoReg(MemtoReg), .MemWrite(MemWrite), .ALUSrc(ALUSrc), .RegWrite(RegWrite));
+    Imm_Gen IG(.Instruction(IFID_Instruction), .Imm(Imm));
+    RegisterFile RF(.clk(clk), .reset(reset), .WriteData(WriteData), .RS1(RS1), .RS2(RS2), .RD(MW_RD), .RegWrite(MW_RegWrite), .ReadData1(ReadData1), .ReadData2(ReadData2));
+    assign Funct = {IFID_Instruction[30], IFID_Instruction[14:12]};
+    ID_EX idex(.clk(clk), .reset(reset), .Branch(Branch), .MemRead(MemRead), .MemWrite(MemWrite), .MemtoReg(MemtoReg), .RegWrite(RegWrite), .ALUSrc(ALUSrc), .ALUOp(ALUOp),
+            .Funct(Funct), .RS1(RS1), .RS2(RS2), .RD(RD), .IFID_PC_Out(IFID_PC_Out), .ReadData1(ReadData1), .ReadData2(ReadData2), .Imm(Imm),
+            .IDEX_Branch(IDEX_Branch), .IDEX_MemRead(IDEX_MemRead), .IDEX_MemWrite(IDEX_MemWrite), .IDEX_MemtoReg(IDEX_MemtoReg), .IDEX_RegWrite(IDEX_RegWrite), .IDEX_ALUSrc(IDEX_ALUSrc),
+            .IDEX_ALUOp(IDEX_ALUOp), .IDEX_Funct(IDEX_Funct), .IDEX_RS1(IDEX_RS1), .IDEX_RS2(IDEX_RS2), .IDEX_RD(IDEX_RD),
+            .IDEX_PC_Out(IDEX_PC_Out), .IDEX_ReadData1(IDEX_ReadData1), .IDEX_ReadData2(IDEX_ReadData2), .IDEX_Imm(IDEX_Imm));
+    
+    // Stage 3 - Execution // 
+    Adder add2(.A(IDEX_PC_Out), .B(IDEX_Imm << 1), .Out(Adder2Out));
+    Mux_2x1 muxmid(.A(IDEX_ReadData2), .B(IDEX_Imm), .S(IDEX_ALUSrc), .Out(MuxmidOut));
+    ALU_Control AluC(.ALUOp(IDEX_ALUOp), .Funct(IDEX_Funct), .Operation(Operation));
+    ALU64bit ALU(.A(IDEX_ReadData1), .B(MuxmidOut), .ALUOp(Operation), .Result(Result), .Zero(Zero));
+    EX_MEM EM(.clk(clk), .reset(reset), .Branch(IDEX_Branch), .MemRead(IDEX_MemRead), .MemWrite(IDEX_MemWrite), .MemtoReg(IDEX_MemtoReg), .RegWrite(IDEX_RegWrite),
+            .Zero(Zero), .RD(IDEX_RD), .Adder2Out(Adder2Out), .Result(Result), .WriteData(WriteData), 
+            .EM_Branch(EM_Branch), .EM_MemRead(EM_MemRead), .EM_MemWrite(EM_MemWrite), .EM_MemtoReg(EM_MemtoReg), .EM_RegWrite(EM_RegWrite), .EM_Zero(EM_Zero), .EM_RD(EM_RD), .EM_Adder2Out(EM_Adder2Out), .EM_Result(EM_Result), .EM_WriteData(EM_WriteData));
+    
+    // Stage 4 - Memory Access // 
+    assign sel_Branch = EM_Branch && EM_Zero;
+    Data_Memory DM(.clk(clk), .MemWrite(EM_MemWrite), .MemRead(EM_MemRead), .Mem_Addr(EM_Result), .Write_Data(EM_WriteData), .Read_Data(Read_Data));
+    MEM_WB MW(.clk(clk), .reset(reset), .MemtoReg(EM_MemtoReg), .RegWrite(EM_RegWrite), .RD(EM_RD), .EM_Result(EM_Result), .Read_Data(Read_Data), 
+            .MW_MemtoReg(MW_MemtoReg), .MW_RegWrite(MW_RegWrite), .MW_RD(MW_RD), .MW_Result(MW_Result), .MW_Read_Data(MW_Read_Data));
+    
+    // Stage 5 - Write Back //
+    Mux_2x1 muxlast(.A(MW_Read_Data), .B(MW_Result), .S(MW_MemtoReg), .Out(WriteData));
 endmodule
