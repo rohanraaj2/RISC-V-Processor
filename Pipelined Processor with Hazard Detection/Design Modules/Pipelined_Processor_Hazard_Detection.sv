@@ -18,83 +18,83 @@
 `include "stalling.v"
 `include "forwarding.v"
 
-module RISC_V_Processor(clk, reset, Init_PC_In,Init_PC_Out,MUX1_Input1,MUX1_Input2,Instruction_IF,Instruction_ID,PC_Out_ID,opcode_ID,rd_ID,f3_ID,rs1_ID,rs2_ID,f7_ID,imm_data_ID,MUX5_Out,rd_WB,Read_Data_1_ID,Read_Data_2_ID,RegWrite_WB,ALUOp_ID,Branch_ID,MemRead_ID,MemtoReg_ID,MemWrite_ID,ALUSrc_ID,RegWrite_ID,Branch_EX,MemRead_EX,MemtoReg_EX,MemWrite_EX,ALUSrc_EX,RegWrite_EX,Read_Data_1_EX,Read_Data_2_EX,PC_Out_EX,ALUOp_EX,imm_data_EX,Funct_EX,rs1_EX,rs2_EX,rd_EX,Operation_EX,shift_Left_out,Branch_Adder_Out_EX,MUX_out_EX,Result_EX,Zero_EX,pos_EX,RegWrite_MEM,MemtoReg_MEM,MemWrite_MEM,MemRead_MEM,Branch_MEM,Zero_MEM,Result_MEM,Branch_Adder_Out_MEM,Read_Data_2_MEM,rd_MEM,pos_MEM,to_branch_MEM,blt_MEM,bge_MEM,bne_MEM,beq_MEM,funct3_MEM,Read_Data_MEM,MemtoReg_WB,Read_Data_WB,Result_WB,PC_Write,MUX_Write,IFID_Write,Forward_A, Forward_B);
-    input clk;
-    input reset;
-    output reg [63:0] Init_PC_In;
-    output reg [63:0] Init_PC_Out;
-    output reg  [63:0] MUX1_Input1;
-    output reg  [63:0] MUX1_Input2;
-    output reg  [31:0] Instruction_IF;
-    output reg  [31:0] Instruction_ID;
-    output reg  [63:0] PC_Out_ID;
-    output reg  [6:0] opcode_ID;
-    output reg  [4:0] rd_ID;
-    output reg  [2:0] f3_ID;
-    output reg  [4:0] rs1_ID;
-    output reg  [4:0] rs2_ID;
-    output reg  [6:0] f7_ID;
-    output reg  [63:0] imm_data_ID;
-    output reg  [63:0] MUX5_Out;
-    output reg  [4:0] rd_WB;
-    output reg  [63:0] Read_Data_1_ID;
-    output reg  [63:0] Read_Data_2_ID;
-    output reg  RegWrite_WB;
-    output reg  [1:0] ALUOp_ID;
-    output reg  Branch_ID;
-    output reg  MemRead_ID;
-    output reg  MemtoReg_ID;
-    output reg  MemWrite_ID;
-    output reg  ALUSrc_ID;
-    output reg  RegWrite_ID;
-    output reg  Branch_EX;
-    output reg  MemRead_EX;
-    output reg  MemtoReg_EX;
-    output reg  MemWrite_EX;
-    output reg  ALUSrc_EX;
-    output reg  RegWrite_EX;
-    output reg  [63:0] Read_Data_1_EX;
-    output reg  [63:0] Read_Data_2_EX;
-    output reg  [63:0] PC_Out_EX;
-    output reg  [1:0] ALUOp_EX;
-    output reg  [63:0] imm_data_EX;
-    output reg  [3:0] Funct_EX;
-    output reg  [4:0] rs1_EX;
-    output reg  [4:0] rs2_EX;
-    output reg  [4:0] rd_EX;
-    output reg  [3:0] Operation_EX;
-    output reg  [63:0] shift_Left_out;
-    output reg  [63:0] Branch_Adder_Out_EX;
-    output reg  [63:0] MUX_out_EX;
-    output reg  [63:0] Result_EX;
-    output reg  Zero_EX;
-    output reg  pos_EX;
-    output reg  RegWrite_MEM;
-    output reg  MemtoReg_MEM;
-    output reg  MemWrite_MEM;
-    output reg  MemRead_MEM;
-    output reg  Branch_MEM;
-    output reg  Zero_MEM;
-    output reg  [63:0] Result_MEM;
-    output reg  [63:0] Branch_Adder_Out_MEM;
-    output reg  [63:0] Read_Data_2_MEM;
-    output reg  [4:0] rd_MEM;
-    output reg  pos_MEM;
-    output reg  to_branch_MEM;
-    output reg  blt_MEM;
-    output reg  bge_MEM;
-    output reg  bne_MEM;
-    output reg  beq_MEM;
-    output reg  [2:0] funct3_MEM;
-    output reg  [63:0] Read_Data_MEM;
-    output reg  MemtoReg_WB;
-    output reg  [63:0] Read_Data_WB;
-    output reg  [63:0]Result_WB;
-    
-    output reg  PC_Write;
-    output reg  MUX_Write;
-    output reg  IFID_Write;
-    output reg  [1:0] Forward_A; output reg  [1:0] Forward_B;
+module RISC_V_Processor(
+    input clk,
+    input reset,
+    output reg [63:0] Init_PC_In,
+    output reg [63:0] Init_PC_Out,
+    output reg  [63:0] MUX1_Input1,
+    output reg  [63:0] MUX1_Input2,
+    output reg  [31:0] Instruction_IF,
+    output reg  [31:0] Instruction_ID,
+    output reg  [63:0] PC_Out_ID,
+    output reg  [6:0] opcode_ID,
+    output reg  [4:0] rd_ID,
+    output reg  [2:0] f3_ID,
+    output reg  [4:0] rs1_ID,
+    output reg  [4:0] rs2_ID,
+    output reg  [6:0] f7_ID,
+    output reg  [63:0] imm_data_ID,
+    output reg  [63:0] MUX5_Out,
+    output reg  [4:0] rd_WB,
+    output reg  [63:0] Read_Data_1_ID,
+    output reg  [63:0] Read_Data_2_ID,
+    output reg  RegWrite_WB,
+    output reg  [1:0] ALUOp_ID,
+    output reg  Branch_ID,
+    output reg  MemRead_ID,
+    output reg  MemtoReg_ID,
+    output reg  MemWrite_ID,
+    output reg  ALUSrc_ID,
+    output reg  RegWrite_ID,
+    output reg  Branch_EX,
+    output reg  MemRead_EX,
+    output reg  MemtoReg_EX,
+    output reg  MemWrite_EX,
+    output reg  ALUSrc_EX,
+    output reg  RegWrite_EX,
+    output reg  [63:0] Read_Data_1_EX,
+    output reg  [63:0] Read_Data_2_EX,
+    output reg  [63:0] PC_Out_EX,
+    output reg  [1:0] ALUOp_EX,
+    output reg  [63:0] imm_data_EX,
+    output reg  [3:0] Funct_EX,
+    output reg  [4:0] rs1_EX,
+    output reg  [4:0] rs2_EX,
+    output reg  [4:0] rd_EX,
+    output reg  [3:0] Operation_EX,
+    output reg  [63:0] shift_Left_out,
+    output reg  [63:0] Branch_Adder_Out_EX,
+    output reg  [63:0] MUX_out_EX,
+    output reg  [63:0] Result_EX,
+    output reg  Zero_EX,
+    output reg  pos_EX,
+    output reg  RegWrite_MEM,
+    output reg  MemtoReg_MEM,
+    output reg  MemWrite_MEM,
+    output reg  MemRead_MEM,
+    output reg  Branch_MEM,
+    output reg  Zero_MEM,
+    output reg  [63:0] Result_MEM,
+    output reg  [63:0] Branch_Adder_Out_MEM,
+    output reg  [63:0] Read_Data_2_MEM,
+    output reg  [4:0] rd_MEM,
+    output reg  pos_MEM,
+    output reg  to_branch_MEM,
+    output reg  blt_MEM,
+    output reg  bge_MEM,
+    output reg  bne_MEM,
+    output reg  beq_MEM,
+    output reg  [2:0] funct3_MEM,
+    output reg  [63:0] Read_Data_MEM,
+    output reg  MemtoReg_WB,
+    output reg  [63:0] Read_Data_WB,
+    output reg  [63:0]Result_WB,
+    output reg  PC_Write,
+    output reg  MUX_Write,
+    output reg  IFID_Write,
+    output reg  [1:0] Forward_A,
+    output reg  [1:0] Forward_B);
   
     wire [63:0] Init_PC_In;
     wire [63:0] Init_PC_Out;
