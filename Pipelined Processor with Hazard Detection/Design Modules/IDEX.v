@@ -1,7 +1,7 @@
 module IDEX(clk, reset, Funct_inp, ALUOp_inp,  MemtoReg_inp, RegWrite_inp, Branch_inp, MemWrite_inp, MemRead_inp, ALUSrc_inp, ReadData1_inp, ReadData2_inp, rd_inp, rs1_in, rs2_in, imm_data_inp, PC_In, PC_Out, Funct_out,  ALUOp_out, MemtoReg__out, RegWrite_out,  Branch_out, MemWrite_out, MemRead_out, ALUSrc_out,  ReadData1_out, ReadData2_out, rs1_out, rs2_out, rd_out, imm_data_out);
   
-  input wire clk,
-  input reset,
+  input wire clk;
+  input reset;
   input [3:0] Funct_inp;
   input [1:0] ALUOp_inp;
   input MemtoReg_inp;
