@@ -1,9 +1,10 @@
-module IFID(clk, reset, PC_In, Inst_input,	Inst_output, PC_Out);
+module IFID(clk, reset, PC_In, Inst_input,	Inst_output, PC_Out, IFID_Write);
   
   input wire clk;
   input reset;
   input wire [63:0] PC_In;
   input  [31:0] Inst_input;
+  input IFID_Write;
   output reg [31:0]Inst_output;
   output reg [63:0] PC_Out;
   
